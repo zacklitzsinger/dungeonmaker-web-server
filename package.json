@@ -1,0 +1,17 @@
+{
+  "name": "dmwebserver",
+  "version": "0.0.0",
+  "description": "A web server for Dungeon Maker",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "zelitzsi@ncsu.edu",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.14.1",
+    "lowdb": "^0.15.5",
+    "multer": "^1.3.0"
+  }
+}
