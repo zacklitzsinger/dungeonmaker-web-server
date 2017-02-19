@@ -11,14 +11,21 @@ var app = express();
 var upload = multer({dest: "levels"});
 
 app.get("/", function (req, res) {
-  res.send("hello world");
+  res.send("DM web server");
 });
 
 app.post("/levels", upload.single("level"), function (req, res) {
   var levelName = req.body.levelName;
   var levelInfo = {};
+  var oldFilename = db.get("levelInfo").get(levelName).get("__filename").value();
+  if (oldFilename != null && fs.existsSync(path.join("levels", oldFilename)))
+  {
+    fs.unlinkSync(path.join("levels", oldFilename));
+  }
   levelInfo[levelName] = {
     name: levelName,
+    author: req.body.author,
+    description: req.body.description,
     size: req.file.size,
     __filename: req.file.filename
   };
