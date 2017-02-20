@@ -8,7 +8,14 @@ var fileAsync = require("lowdb/lib/storages/file-async");
 var db = lowdb("db.json", {storage: fileAsync});
 
 var app = express();
-var upload = multer({dest: "levels"});
+// Limit uploaded levels to 1MB (huge compared to current level sizes, ~100KB for a large level).
+// 40K levels can fit into 5GB, which is the default for AWS server.
+var upload = multer({dest: "levels", limits: {fileSize: 1e6}});
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+})
 
 app.get("/", function (req, res) {
   res.send("DM web server");
