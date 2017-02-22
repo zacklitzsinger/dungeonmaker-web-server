@@ -1,27 +1,20 @@
 var express = require("express");
+var router = express.Router();
 var multer = require("multer");
 var fs = require("fs");
 var path = require("path");
-var lowdb = require("lowdb");
-var fileAsync = require("lowdb/lib/storages/file-async");
 
-var db = lowdb("db.json", {storage: fileAsync});
+var db = require("../model/db");
 
-var app = express();
 // Limit uploaded levels to 1MB (huge compared to current level sizes, ~100KB for a large level).
 // 40K levels can fit into 5GB, which is the default for AWS server.
 var upload = multer({dest: "levels", limits: {fileSize: 1e6}});
 
-app.use(function (err, req, res, next) {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-})
-
-app.get("/", function (req, res) {
+router.get("/", function (req, res) {
   res.send("DM web server");
 });
 
-app.post("/levels", upload.single("level"), function (req, res) {
+router.post("/levels", upload.single("level"), function (req, res) {
   var levelName = req.body.levelName;
   var levelInfo = {};
   var oldFilename = db.get("levelInfo").get(levelName).get("__filename").value();
@@ -48,11 +41,11 @@ app.post("/levels", upload.single("level"), function (req, res) {
   })
 });
 
-app.get("/levels", function (req, res) {
+router.get("/levels", function (req, res) {
   res.json(db.get("levelInfo").value());
 });
 
-app.get("/levels/:name", function (req, res) {
+router.get("/levels/:name", function (req, res) {
   var levelName = req.params.name;
   var info = db
     .get("levelInfo")
@@ -62,16 +55,10 @@ app.get("/levels/:name", function (req, res) {
   res.json(info);
 });
 
-app.get("/levels/download/:name", function ( req, res) {
+router.get("/levels/download/:name", function ( req, res) {
   var levelName = req.params.name;
   var filename = db.get("levelInfo").get(levelName).get("__filename").value();
   res.sendFile(path.join(__dirname, "levels", filename));
 });
 
-db.defaults({levels: [], levelInfo: {}})
-  .write()
-  .then(function () {
-    app.listen(3000, function () {
-      console.log("DM Web Server listening on port 3000!");
-    })
-  });
+module.exports = router;
