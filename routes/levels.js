@@ -10,11 +10,7 @@ var db = require("../model/db");
 // 40K levels can fit into 5GB, which is the default for AWS server.
 var upload = multer({dest: "levels", limits: {fileSize: 1e6}});
 
-router.get("/", function (req, res) {
-  res.send("DM web server");
-});
-
-router.post("/levels", upload.single("level"), function (req, res) {
+router.post("/", upload.single("level"), function (req, res) {
   var levelName = req.body.levelName;
   var levelInfo = {};
   var oldFilename = db.get("levelInfo").get(levelName).get("__filename").value();
@@ -41,24 +37,24 @@ router.post("/levels", upload.single("level"), function (req, res) {
   })
 });
 
-router.get("/levels", function (req, res) {
+router.get("/", function (req, res) {
   res.json(db.get("levelInfo").value());
 });
 
-router.get("/levels/:name", function (req, res) {
+router.get("/:name", function (req, res) {
   var levelName = req.params.name;
   var info = db
     .get("levelInfo")
     .get(levelName)
-    .omitBy(function(key) { return key[0] == "_"; })
+    .omitBy(function(key) { return key != null && key[0] == "_"; })
     .value();
   res.json(info);
 });
 
-router.get("/levels/download/:name", function ( req, res) {
+router.get("/download/:name", function ( req, res) {
   var levelName = req.params.name;
   var filename = db.get("levelInfo").get(levelName).get("__filename").value();
-  res.sendFile(path.join(__dirname, "levels", filename));
+  res.sendFile(path.join(__dirname, "..", "levels", filename));
 });
 
 module.exports = router;
