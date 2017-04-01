@@ -3,6 +3,10 @@ var fileAsync = require("lowdb/lib/storages/file-async");
 
 var db = lowdb("db.json", {storage: fileAsync});
 
-db.defaults({levels: [], levelInfo: {}}).write();
+db.defaults({
+  levels: [],
+  levelInfo: {},
+  users: {}
+}).write();
 
 module.exports = db;

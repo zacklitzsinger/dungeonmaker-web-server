@@ -4,6 +4,8 @@ var multer = require("multer");
 var fs = require("fs");
 var path = require("path");
 
+var passport = require("../passport");
+var util = require("../util");
 var db = require("../model/db");
 
 // Limit uploaded levels to 1MB (huge compared to current level sizes, ~100KB for a large level).
@@ -37,21 +39,21 @@ router.post("/", upload.single("level"), function (req, res) {
   })
 });
 
-router.get("/", function (req, res) {
+router.get("/", util.requireAuth, function (req, res) {
   res.json(db.get("levelInfo").value());
 });
 
-router.get("/:name", function (req, res) {
+router.get("/:name", util.requireAuth, function (req, res) {
   var levelName = req.params.name;
   var info = db
     .get("levelInfo")
     .get(levelName)
-    .omitBy(function(key) { return key != null && key[0] == "_"; })
+    .omitBy(util.isPrivate)
     .value();
   res.json(info);
 });
 
-router.get("/download/:name", function ( req, res) {
+router.get("/download/:name", util.requireAuth, function ( req, res) {
   var levelName = req.params.name;
   var filename = db.get("levelInfo").get(levelName).get("__filename").value();
   res.sendFile(path.join(__dirname, "..", "levels", filename));
