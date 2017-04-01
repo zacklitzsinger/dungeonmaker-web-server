@@ -1,6 +1,5 @@
 var express = require("express");
 var router = express.Router();
-var passport = require("../passport");
 var bcrypt = require("bcrypt");
 const saltRounds = 10;
 
@@ -30,6 +29,7 @@ router.put("/:username", function (req, res) {
   })
 });
 
+// Read a user
 router.get("/:username", util.requireAuth, function (req, res) {
   var username = req.params.username;
   if (!username || username.length == 0)
@@ -40,15 +40,5 @@ router.get("/:username", util.requireAuth, function (req, res) {
   .value();
   res.json(user);
 });
-
-// Login
-router.post("/login", passport.authenticate('local'), function(req, res){
-  res.send();
-});
-
-router.post("/logout", function(req, res) {
-  req.session.destroy();
-  res.send();
-})
 
 module.exports = router;

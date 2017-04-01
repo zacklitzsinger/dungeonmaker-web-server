@@ -22,7 +22,7 @@ Requirements:
   - <userid> creator
   - <string> description
   - <uuid> id (in case the level name changes)
-  - <string> filename where level is stored on disc
+  - <string> filename where level is stored on disk
   - <list(comments)> list of comments about the level
   - <int> plays
   - <int> clears
