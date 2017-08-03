@@ -8,11 +8,14 @@ var util = require("../util");
 var db = require("../model/db");
 
 // Create a user
-router.put("/:username", function (req, res) {
-  var username = req.params.username;
+router.post("/register", function (req, res) {
+  var username = req.body.username;
   var password = req.body.password;
   if (!password || password.length == 0)
-    return res.status(400).send();
+    return res.status(400).send(new Error("no password sent"));
+  var existingUser = db.get("users").get(username).value();
+  if (existingUser)
+    return res.status(400).send(new Error("username taken"));
   bcrypt.hash(password, saltRounds)
   .then(function(hash){
     var userObj = {};
